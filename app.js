@@ -7,6 +7,7 @@ app.get('/', function(req, res) {
 });
 
 users = [];
+latAndLanData=[]
 io.on('connection', function(socket) {
    console.log('A user connected');
    socket.on('setUsername', function(data) {
@@ -19,6 +20,28 @@ io.on('connection', function(socket) {
     console.log(data)
     io.sockets.emit('newmsg', data);
     
+ })
+ socket.on('maps',function(data){
+    console.log(data)
+    var j=0
+    if(latAndLanData.length==0){
+      latAndLanData.push(data)
+    }
+    else{
+      for(var i=0;i<latAndLanData.length;i++){
+         console.log(data.phno)
+         if(latAndLanData[i].phno===data.phno){
+           latAndLanData[i].lat=data.lat
+           latAndLanData[i].long=data.long
+          j=j+1
+         }
+    }
+    if(j==0){
+      latAndLanData.push(data)
+    }
+       }    
+       console.log(latAndLanData)
+       io.sockets.emit('maplocation',latAndLanData);
  })  
 });
 

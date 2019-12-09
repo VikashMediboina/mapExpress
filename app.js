@@ -1,24 +1,36 @@
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const bodyParser =require("body-parser");
+const cors= require('cors');
 
+app.use(cors())
+app.use(bodyParser.json())
 app.get('/', function(req, res) {
    res.json({hello:"world"});
 });
 
 users = [];
+  
 latAndLanData=[]
+app.get('/users',function(req,res){
+   res.json(users)
+})
 io.on('connection', function(socket) {
    console.log('A user connected');
    socket.on('setUsername', function(data) {
      console.log(data)
         //  socket.emit('userSet', {username: data});
+        users.push(data)
+        
      }
    )
    socket.on('msg', function(data) {
     //Send message to everyone
-    console.log(data)
-    io.sockets.emit('newmsg', data);
+
+    console.log(data)  
+    io.sockets.emit('newmsg'+data.user+data.oPhno, data);
+    io.sockets.emit( 'newmsg'+data.oPhno+data.user , data);
     
  })
  socket.on('maps',function(data){
